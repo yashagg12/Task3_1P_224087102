@@ -12,132 +12,128 @@ import org.junit.Test;
 public class DateUtilTest {
 	
 	@Test
-	public void testStudentIdentity() {
-		String studentId = "224087102";
-		Assert.assertNotNull("Student ID is null", studentId);
-	}
-
-	@Test
-	public void testStudentName() {
-		String studentName = "Yash";
-		Assert.assertNotNull("Student name is null", studentName);
-	}
-
-	@Test
-	public void testMaxJanuary31ShouldIncrementToFebruary1() {
-		// January max boundary area: max+1
-		DateUtil date = new DateUtil(31, 1, 2024);
-        System.out.println("january31ShouldIncrementToFebruary1 > " + date);
+    public void testStartOfYearIncrement() {
+        DateUtil date = new DateUtil(1, 1, 2023);
         date.increment();
-        System.out.println(date);
-        Assert.assertEquals(2, date.getMonth());
-        Assert.assertEquals(1, date.getDay());
-	}
-	
-	@Test
-	public void testMaxJanuary31ShouldDecrementToJanuary30() {
-		// January max boundary area: max-1
-		DateUtil date = new DateUtil(31, 1, 2024);
-        System.out.println("january31ShouldDecrementToJanuary30 > " + date);
-        date.decrement();
-        System.out.println(date);
-        Assert.assertEquals(30, date.getDay());
+        System.out.println("Test A1: 1-1-2023 -> Next = " + date);
+        Assert.assertEquals(2, date.getDay());
         Assert.assertEquals(1, date.getMonth());
-	}
-	
-	@Test
-	public void testNominalJanuary() {
-		int rand_day_1_to_31 = 1 + new Random().nextInt(31);
-        DateUtil date = new DateUtil(rand_day_1_to_31, 1, 2024);
-        System.out.println("testJanuaryNominal > " + date);
+        Assert.assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    public void testEndOfYearDecrement() {
+        DateUtil date = new DateUtil(31, 12, 2023);
+        date.decrement();
+        System.out.println("Test A2: 31-12-2023 -> Prev = " + date);
+        Assert.assertEquals(30, date.getDay());
+        Assert.assertEquals(12, date.getMonth());
+        Assert.assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    public void testFebruary28NonLeapYearIncrement() {
+        DateUtil date = new DateUtil(28, 2, 2023);
         date.increment();
-        System.out.println(date);
-	}
-	
-	// **Boundary Value Tests for January**
-		@Test
-		public void testMinJanuary1ShouldIncrementToJanuary2() {
-			DateUtil date = new DateUtil(1, 1, 2024);
-	        date.increment();
-	        Assert.assertEquals(2, date.getDay());
-	        Assert.assertEquals(1, date.getMonth());
-		}
-		
-		@Test
-		public void testMinJanuary1ShouldDecrementToDecember31() {
-			DateUtil date = new DateUtil(1, 1, 2024);
-	        date.decrement();
-	        Assert.assertEquals(31, date.getDay());
-	        Assert.assertEquals(12, date.getMonth());
-	        Assert.assertEquals(2023, date.getYear());
-		}
+        System.out.println("Test A3: 28-2-2023 -> Next = " + date);
+        Assert.assertEquals(1, date.getDay());
+        Assert.assertEquals(3, date.getMonth());
+    }
 
-		// **February (Leap Year)**
-		@Test
-		public void testMaxFebruary29ShouldIncrementToMarch1() {
-			DateUtil date = new DateUtil(29, 2, 2024);
-	        date.increment();
-	        Assert.assertEquals(1, date.getDay());
-	        Assert.assertEquals(3, date.getMonth());
-		}
+    @Test
+    public void testFebruary28LeapYearIncrement() {
+        DateUtil date = new DateUtil(28, 2, 2024);
+        date.increment();
+        System.out.println("Test A4: 28-2-2024 -> Next = " + date);
+        Assert.assertEquals(29, date.getDay());
+        Assert.assertEquals(2, date.getMonth());
+    }
 
-		@Test
-		public void testMinFebruary1ShouldDecrementToJanuary31() {
-			DateUtil date = new DateUtil(1, 2, 2024);
-	        date.decrement();
-	        Assert.assertEquals(31, date.getDay());
-	        Assert.assertEquals(1, date.getMonth());
-		}
-		
-		// **March**
-		@Test
-		public void testMaxMarch31ShouldIncrementToApril1() {
-			DateUtil date = new DateUtil(31, 3, 2024);
-	        date.increment();
-	        Assert.assertEquals(1, date.getDay());
-	        Assert.assertEquals(4, date.getMonth());
-		}
+    @Test(expected = RuntimeException.class)
+    public void testInvalidDayZero() {
+        System.out.println("Test A5: 0-5-2023 -> Invalid");
+        new DateUtil(0, 5, 2023);
+    }
 
-		@Test
-		public void testMinMarch1ShouldDecrementToFebruary29() {
-			DateUtil date = new DateUtil(1, 3, 2024);
-	        date.decrement();
-	        Assert.assertEquals(29, date.getDay());
-	        Assert.assertEquals(2, date.getMonth());
-		}
+    @Test(expected = RuntimeException.class)
+    public void testInvalidMonthThirteen() {
+        System.out.println("Test A6: 15-13-2023 -> Invalid");
+        new DateUtil(15, 13, 2023);
+    }
 
-		// **April**
-		@Test
-		public void testMaxApril30ShouldIncrementToMay1() {
-			DateUtil date = new DateUtil(30, 4, 2024);
-	        date.increment();
-	        Assert.assertEquals(1, date.getDay());
-	        Assert.assertEquals(5, date.getMonth());
-		}
+    @Test(expected = RuntimeException.class)
+    public void testInvalidYearTooLow() {
+        System.out.println("Test A7: 15-5-1600 -> Invalid");
+        new DateUtil(15, 5, 1600);
+    }
 
-		@Test
-		public void testMinApril1ShouldDecrementToMarch31() {
-			DateUtil date = new DateUtil(1, 4, 2024);
-	        date.decrement();
-	        Assert.assertEquals(31, date.getDay());
-	        Assert.assertEquals(3, date.getMonth());
-		}
+    @Test(expected = RuntimeException.class)
+    public void testInvalidYearTooHigh() {
+        System.out.println("Test A8: 15-5-3000 -> Invalid");
+        new DateUtil(15, 5, 3000);
+    }
 
-		// **December (Year Change)**
-		@Test
-		public void testMaxDecember31ShouldIncrementToJanuary1NextYear() {
-			DateUtil date = new DateUtil(31, 12, 2024);
-	        date.increment();
-	        Assert.assertEquals(1, date.getDay());
-	        Assert.assertEquals(1, date.getMonth());
-	        Assert.assertEquals(2025, date.getYear());
-		}
+    @Test
+    public void testValidLeapYearFebruary29() {
+        DateUtil date = new DateUtil(29, 2, 2020);
+        System.out.println("Test A9: 29-2-2020 -> Valid");
+        Assert.assertEquals(29, date.getDay());
+        Assert.assertEquals(2, date.getMonth());
+        Assert.assertEquals(2020, date.getYear());
+    }
 
-		@Test
-		public void testMinDecember1ShouldDecrementToNovember30() {
-			DateUtil date = new DateUtil(1, 12, 2024);
-	        date.decrement();
-	        Assert.assertEquals(30, date.getDay());
-	        Assert.assertEquals(11, date.getMonth());
-		}
+    @Test(expected = RuntimeException.class)
+    public void testInvalidLeapYearFebruary29() {
+        System.out.println("Test A10: 29-2-2023 -> Invalid");
+        new DateUtil(29, 2, 2023);
+    }
+
+    @Test
+    public void test4B() {
+        DateUtil date = new DateUtil(30, 6, 1994);
+        date.increment();
+        System.out.println("Test 4B: 30-6-1994 -> Next = " + date);
+        Assert.assertEquals(1, date.getDay());
+        Assert.assertEquals(7, date.getMonth());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void test5B_InvalidDate() {
+        System.out.println("Test 5B: 31-6-1994 -> Invalid");
+        new DateUtil(31, 6, 1994);
+    }
+
+    @Test
+    public void test14B_LeapFeb28() {
+        DateUtil date = new DateUtil(28, 2, 2024);
+        date.increment();
+        System.out.println("Test 14B: 28-2-2024 -> Next = " + date);
+        Assert.assertEquals(29, date.getDay());
+        Assert.assertEquals(2, date.getMonth());
+    }
+
+    @Test
+    public void test15B_LeapFeb29() {
+        DateUtil date = new DateUtil(29, 2, 2024);
+        date.increment();
+        System.out.println("Test 15B: 29-2-2024 -> Next = " + date);
+        Assert.assertEquals(1, date.getDay());
+        Assert.assertEquals(3, date.getMonth());
+    }
+
+    @Test
+    public void test16B_March1FromLeapFeb() {
+        DateUtil date = new DateUtil(1, 3, 2024);
+        date.decrement();
+        System.out.println("Test 16B: 1-3-2024 -> Prev = " + date);
+        Assert.assertEquals(29, date.getDay());
+        Assert.assertEquals(2, date.getMonth());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void test17B_InvalidNonLeapFeb29() {
+        System.out.println("Test 17B: 29-2-2023 -> Invalid");
+        new DateUtil(29, 2, 2023);
+    }
+
 }
